@@ -1,49 +1,37 @@
+from keras.models import load_model
+from keras import optimizers
+from keras.utils import  to_categorical
+import numpy as np
+
 import network
 import config
 import utils
 
-import tensorflow as tf
-import os
-
-x = tf.placeholder(dtype=tf.float32,shape=[None,224,224,3])
-y = tf.placeholder(dtype=tf.int32,shape=[None,1])
-one_hot_y = tf.one_hot(y,61)
-rate = tf.placeholder(dtype=tf.float32)
-logit = network.network(x,rate)
-
-loss = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(logits=logit,labels=one_hot_y), name="loss")
-correct_pred = tf.equal( tf.cast( tf.argmax(logit,axis=1),tf.int32 ),y)
-acc = tf.reduce_mean(tf.cast(correct_pred,tf.float32))
-
-output_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope='buttom')
-train_step_tune = tf.train.AdamOptimizer().minimize(loss=loss,var_list = output_vars)
-
-train_step = tf.train.AdamOptimizer().minimize(loss)
 
 trian_img_paths,train_labels = utils.process_annotation(config.TRAIN_ANNOTATION_FILE,config.TRAIN_DIR)
-train_data_gen = utils.data_generator(trian_img_paths,train_labels,batch_size=8)
+train_labels = to_categorical(train_labels,num_classes=61)
+train_gen = utils.train_generator(trian_img_paths,train_labels,config.BATCH_SIZE)
 
-saver = tf.train.Saver()
+features,labels = next(train_gen)
 
-with tf.Session() as sess:
-    sess.run(tf.global_variables_initializer())
+print(features.shape,labels.shape)
 
-    step = 1
-    while True:
-        batch_features, batch_labels = next(train_data_gen)
-        if step < 5000:
-            sess.run(train_step_tune, feed_dict={x:batch_features, y:batch_labels, rate:0.5})
-        else:
-            sess.run(train_step, feed_dict={x:batch_features, y:batch_labels, rate:0.5})
-
-        if step%100 == 0:
-            train_loss = sess.run(loss, feed_dict={x:batch_features, y:batch_labels, rate:1.})
-            accuracy,val_loss = utils.validation(sess, acc, loss, x, y, rate, config.VAL_ANNOTATION_FILE, config.VAL_DIR, 32)
-
-            print("step %s: the training loss is %s, validation loss is %s, validation accuracy is %s")%(step, train_loss, val_loss, accuracy)
-
-        if step%1000 == 0:
-            if not os.path.exists(config.CHECKDIR):
-                os.mkdir(config.CHECKDIR)
-            saver.save(sess, config.CHECKFILE, global_step=step)
-            print('writing checkpoint at step %s' % step)
+# base_model,model = network.vgg_network()
+#
+# model.summary()
+#
+# #freeze the convolutional layers
+# for layer in base_model.layers:
+#     layer.trainable = False
+#
+# print("begin tuning......")
+# print("train samples: %s"%len(train_labels))
+# print("valid samples: %s"%len(valid_labels))
+#
+# sgd = optimizers.SGD(lr=0.001)
+# model.compile(optimizer=sgd, loss='categorical_crossentropy')
+# model.fit_generator(train_gen, steps_per_epoch=ceil(num_train/batch_size), epochs=epochs,validation_data=valid_gen, validation_steps=ceil(num_validation/batch_size))
+#
+# model.save(save_path)
+#
+# print("model saved")

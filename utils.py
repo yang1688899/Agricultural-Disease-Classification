@@ -1,4 +1,3 @@
-import config
 import json
 from sklearn.utils import shuffle
 import cv2
@@ -6,6 +5,9 @@ import random
 import numpy as np
 from math import ceil
 import tensorflow as tf
+
+import config
+import agumetation
 
 #初始化sess,或回复保存的sess
 def start_or_restore_training(sess,saver,checkpoint_dir):
@@ -46,12 +48,12 @@ def random_crop(img,size):
         croped_img = img[:, offset:offset+size]
     return croped_img
 
-def load_feature(img_path):
-    img = cv_imread(img_path)
-    norm_img= (img-128.)/128.
-    resized_img = resize_img(norm_img,config.INPUT_SIZE)
-    crop = random_crop(resized_img, config.INPUT_SIZE)
-    return crop
+def train_agumetation(img):
+    img = agumetation.resize_img(img,config.INPUT_SIZE)
+    img = agumetation.random_crop(img)
+    img = agumetation.random_flip(img,0.5)
+
+    return img-128/128.
 
 def process_annotation(anno_file,dir):
     with open(anno_file) as file:
@@ -63,30 +65,24 @@ def process_annotation(anno_file,dir):
             labels.append(anno["disease_class"])
     return img_paths, labels
 
-def data_generator(img_paths,labels,batch_size,is_shuffle=True):
-    if is_shuffle:
-        img_paths,labels = shuffle(img_paths,labels)
+def train_generator(img_paths,labels,batch_size):
+
+    img_paths,labels = shuffle(img_paths,labels)
     num_sample = len(img_paths)
     while True:
-        if is_shuffle:
-            img_paths, labels = shuffle(img_paths, labels)
+
+        img_paths, labels = shuffle(img_paths, labels)
 
         for offset in range(0,num_sample,batch_size):
             batch_paths = img_paths[offset:offset+batch_size]
             batch_labels = labels[offset:offset+batch_size]
 
-            batch_features = [load_feature(path) for path in batch_paths]
+            batch_features = [train_agumetation(cv_imread(path)) for path in batch_paths]
 
-            yield np.array(batch_features), np.array(batch_labels,dtype=np.int32).reshape([-1,1])
+            yield np.array(batch_features), np.array(batch_labels)
 
-def validation(sess,acc,loss,x,y,rate,anno_file,dir,batch_size):
-    img_paths,labels = process_annotation(anno_file,dir)
-    data_gen = data_generator(img_paths,labels,batch_size,is_shuffle=False)
-    num_sample = len(img_paths)
-    num_it = ceil(num_sample/batch_size)
+def val_generator(img_paths,labels,batch_size):
 
-    total_accuracy = 0
-    total_loss = 0
 
     for i in num_it:
         features,labels = next(data_gen)

@@ -12,10 +12,12 @@ LABEL_NAMES = ["苹果健康","苹果黑星病一般","苹果黑星病严重","�
                "番茄红蜘蛛损伤严重","番茄黄化曲叶病毒病一般","番茄黄化曲叶病毒病严重","番茄花叶病毒病"]
 
 INPUT_SIZE = 224
-TRAIN_ANNOTATION_FILE = "F:/AgriculturalDisease/AgriculturalDisease_trainingset/AgriculturalDisease_train_annotations.json"
+TRAIN_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_train_annotations_20181021.json"
 TRAIN_DIR = "F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/"
-VAL_ANNOTATION_FILE = "F:/AgriculturalDisease/AgriculturalDisease_validationset/AgriculturalDisease_validation_annotations.json"
+VAL_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_validation_annotations_20181021.json"
 VAL_DIR = "F:/AgriculturalDisease/AgriculturalDisease_validationset/images/"
 
 CHECKDIR = "./save/"
 CHECKFILE = "./save/model.ckpt"
+
+BATCH_SIZE = 8
