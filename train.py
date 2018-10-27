@@ -28,46 +28,52 @@ for layer in base_model.layers:
 
 model.summary()
 
-print("begin tuning......")
 print("train samples: %s"%len(train_labels))
 print("valid samples: %s"%len(val_labels))
 
-sgd = optimizers.SGD(lr=1e-2)
+sgd = optimizers.SGD(lr=1e-3)
 model.compile(optimizer=sgd, loss='categorical_crossentropy')
 
 #callback
-early_stopping = EarlyStopping(patience=5, verbose=1)
+early_stopping = EarlyStopping(patience=3, verbose=1)
 model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
-reduce_lr = ReduceLROnPlateau(factor=0.5, patience=3, min_lr=1e-4, verbose=1)
+reduce_lr = ReduceLROnPlateau(factor=0.5, patience=2, min_lr=1e-4, verbose=1)
 
 epochs = 20
 
-history = model.fit_generator(train_gen,
+print("start tuning the classifier......")
+history1 = model.fit_generator(train_gen,
                     steps_per_epoch=ceil(len(train_labels)/config.BATCH_SIZE),
                     epochs=epochs,
                     validation_data=val_gen,
                     validation_steps=ceil(len(val_labels)/config.BATCH_SIZE),
-                    callbacks=[early_stopping, model_checkpoint, reduce_lr])
+                    callbacks=[early_stopping, model_checkpoint, reduce_lr],
+                    verbose=2)
 
 #load the finetuned model
 model = load_model(config.SAVE_MODEL_PATH)
-#unfeeze all layer
+# unfeeze all layer
 for layer in model.layers:
     layer.trainable = True
+model.summary()
 
-adam = optimizers.Adam(lr=1e-3)
+adam = optimizers.Adam(lr=1e-4)
 model.compile(optimizer=adam, loss='categorical_crossentropy')
 
 #callback
 early_stopping = EarlyStopping(patience=20, verbose=1)
 model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
-reduce_lr = ReduceLROnPlateau(factor=0.5, patience=5, min_lr=1e-5, verbose=1)
+reduce_lr = ReduceLROnPlateau(factor=0.5, patience=5, min_lr=1e-6, verbose=1)
 
 epochs = 200
 
-history = model.fit_generator(train_gen,
+print("start fully training the model......")
+history2 = model.fit_generator(train_gen,
                     steps_per_epoch=ceil(len(train_labels)/config.BATCH_SIZE),
                     epochs=epochs,
                     validation_data=val_gen,
                     validation_steps=ceil(len(val_labels)/config.BATCH_SIZE),
-                    callbacks=[early_stopping, model_checkpoint, reduce_lr])
+                    callbacks=[early_stopping, model_checkpoint, reduce_lr],
+                    verbose=2)
+
+utils.save_to_pickle([history1,history2],"history.p")

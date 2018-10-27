@@ -68,20 +68,27 @@ def rotate(image, angle=15, scale=0.9):
 def resize_img(img,size):
     h = img.shape[0]
     w = img.shape[1]
-    scale = max(size/h,size/w)
-    resized_img = cv2.resize( img, (int(w*scale),int(h*scale)) )
+    if size/h>size/w:
+        scale = size/h
+        resized_img = cv2.resize( img, (size,int(w*scale)) )
+    else:
+        scale = size/w
+        resized_img = cv2.resize(img, (int(h*scale), size))
     return resized_img
 
 #对图片进行随机切割,输入图片其中一边与切割大小相等
 def random_crop(img):
     h = img.shape[0]
     w = img.shape[1]
-    if h>w:
-        offset = random.randint(0, h - w)
-        croped_img = img[offset:offset+w, :]
+    if not w == h:
+        if h>w:
+            offset = random.randint(0, h - w -1)
+            croped_img = img[offset:offset+w, :]
+        else:
+            offset = random.randint(0, w - h -1)
+            croped_img = img[:, offset:offset+h]
     else:
-        offset = random.randint(0, w - h)
-        croped_img = img[:, offset:offset+h]
+        return img
     return croped_img
 
 def n_fold_crop(img,n_fold=5):

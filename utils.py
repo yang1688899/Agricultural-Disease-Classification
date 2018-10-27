@@ -5,6 +5,7 @@ import random
 import numpy as np
 from math import ceil
 import tensorflow as tf
+import pickle
 
 import config
 import agumetation
@@ -22,6 +23,15 @@ def start_or_restore_training(sess,saver,checkpoint_dir):
         step = 1
         print('start training from new state')
     return sess,step
+
+def save_to_pickle(obj,savepath):
+    with open(savepath,"wb") as file:
+        pickle.dump(obj,file)
+
+def load_pickle(path):
+    with open(path,"rb") as file:
+        obj = pickle.load(file)
+        return obj
 
 #含中文路径读取图片方法
 def cv_imread(filepath):
