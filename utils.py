@@ -30,20 +30,27 @@ def cv_imread(filepath):
 def resize_img(img,size):
     h = img.shape[0]
     w = img.shape[1]
-    scale = max(size/h,size/w)
-    resized_img = cv2.resize( img, (int(h*scale),int(w*scale)) )
+    if size/h>size/w:
+        scale = size/h
+        resized_img = cv2.resize( img, (size,int(w*scale)) )
+    else:
+        scale = size/w
+        resized_img = cv2.resize(img, (int(h*scale), size))
     return resized_img
 
 #对缩放图片进行随机切割,要求输入图片其中一边与切割大小相等
 def random_crop(img,size):
     h = img.shape[0]
     w = img.shape[1]
-    if h>w:
-        offset = random.randint(0, h - size)
-        croped_img = img[offset:offset+size, :]
+    if not w==h:
+        if h>w:
+            offset = random.randint(0, h - size -1)
+            croped_img = img[offset:offset+size, :]
+        else:
+            offset = random.randint(0, w - size -1)
+            croped_img = img[:, offset:offset+size]
     else:
-        offset = random.randint(0, w - size)
-        croped_img = img[:, offset:offset+size]
+        return img
     return croped_img
 
 def load_feature(img_path):
@@ -51,6 +58,7 @@ def load_feature(img_path):
     norm_img= (img-128.)/128.
     resized_img = resize_img(norm_img,config.INPUT_SIZE)
     crop = random_crop(resized_img, config.INPUT_SIZE)
+
     return crop
 
 def process_annotation(anno_file,dir):
@@ -88,10 +96,17 @@ def validation(sess,acc,loss,x,y,rate,anno_file,dir,batch_size):
     total_accuracy = 0
     total_loss = 0
 
-    for i in num_it:
+    for i in range(num_it):
         features,labels = next(data_gen)
-        accuracy,loss = sess.run([acc,loss],feed_dict={x:features, y:labels, rate:1.0})
+        accuracy,val_loss = sess.run([acc,loss],feed_dict={x:features, y:labels, rate:1.0})
         total_accuracy += accuracy
-        total_loss += loss
+        total_loss += val_loss
 
     return total_accuracy/num_it,total_loss/num_it
+
+
+# trian_img_paths,train_labels = process_annotation(config.TRAIN_ANNOTATION_FILE,config.TRAIN_DIR)
+# train_data_gen = data_generator(trian_img_paths,train_labels,batch_size=16)
+#
+# for i in range(10000):
+#     next(train_data_gen)
