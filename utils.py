@@ -55,6 +55,12 @@ def train_agumetation(img):
 
     return img-128/128.
 
+# def val_agumetation(img,n_fold=3):
+#     img = agumetation.resize_img(img,config.INPUT_SIZE)
+#     img = agumetation.random_flip(img, 0.5)
+#     imgs = agumetation.n_fold_crop(img,n_fold=3)
+#     return imgs
+
 def process_annotation(anno_file,dir):
     with open(anno_file) as file:
         annotations = json.load(file)
@@ -65,13 +71,13 @@ def process_annotation(anno_file,dir):
             labels.append(anno["disease_class"])
     return img_paths, labels
 
-def train_generator(img_paths,labels,batch_size):
-
-    img_paths,labels = shuffle(img_paths,labels)
+def data_generator(img_paths,labels,batch_size,is_shuffle=True):
+    if is_shuffle:
+        img_paths,labels = shuffle(img_paths,labels)
     num_sample = len(img_paths)
     while True:
-
-        img_paths, labels = shuffle(img_paths, labels)
+        if is_shuffle:
+            img_paths, labels = shuffle(img_paths, labels)
 
         for offset in range(0,num_sample,batch_size):
             batch_paths = img_paths[offset:offset+batch_size]
@@ -81,13 +87,13 @@ def train_generator(img_paths,labels,batch_size):
 
             yield np.array(batch_features), np.array(batch_labels)
 
-def val_generator(img_paths,labels,batch_size):
-
-
-    for i in num_it:
-        features,labels = next(data_gen)
-        accuracy,loss = sess.run([acc,loss],feed_dict={x:features, y:labels, rate:1.0})
-        total_accuracy += accuracy
-        total_loss += loss
-
-    return total_accuracy/num_it,total_loss/num_it
+# def val_generator(img_paths,labels,batch_size,n_fold=3):
+#     num_sample = len(img_paths)
+#     while True:
+#         for offset in range(0, num_sample, batch_size):
+#             batch_paths = img_paths[offset:offset + batch_size]
+#             batch_labels = labels[offset:offset + batch_size]
+#
+#             batch_features = [train_agumetation(cv_imread(path)) for path in batch_paths]
+#
+#             yield np.array(batch_features), np.array(batch_labels)

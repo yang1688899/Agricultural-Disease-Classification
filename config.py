@@ -17,7 +17,6 @@ TRAIN_DIR = "F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/"
 VAL_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_validation_annotations_20181021.json"
 VAL_DIR = "F:/AgriculturalDisease/AgriculturalDisease_validationset/images/"
 
-CHECKDIR = "./save/"
-CHECKFILE = "./save/model.ckpt"
+SAVE_MODEL_PATH = "./save/vgg16_224_categorical_crossentropy.model"
 
 BATCH_SIZE = 8
