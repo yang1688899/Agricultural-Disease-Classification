@@ -32,15 +32,15 @@ print("begin tuning......")
 print("train samples: %s"%len(train_labels))
 print("valid samples: %s"%len(val_labels))
 
-sgd = optimizers.SGD(lr=0.01)
+sgd = optimizers.SGD(lr=1e-2)
 model.compile(optimizer=sgd, loss='categorical_crossentropy')
 
 #callback
-early_stopping = EarlyStopping(patience=3, verbose=1)
+early_stopping = EarlyStopping(patience=5, verbose=1)
 model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
-reduce_lr = ReduceLROnPlateau(factor=0.5, patience=2, min_lr=0.00001, verbose=1)
+reduce_lr = ReduceLROnPlateau(factor=0.5, patience=3, min_lr=1e-4, verbose=1)
 
-epochs = 5
+epochs = 20
 
 history = model.fit_generator(train_gen,
                     steps_per_epoch=ceil(len(train_labels)/config.BATCH_SIZE),
@@ -55,15 +55,15 @@ model = load_model(config.SAVE_MODEL_PATH)
 for layer in model.layers:
     layer.trainable = True
 
-adam = optimizers.Adam(lr=0.001)
+adam = optimizers.Adam(lr=1e-3)
 model.compile(optimizer=adam, loss='categorical_crossentropy')
 
 #callback
-early_stopping = EarlyStopping(patience=5, verbose=1)
+early_stopping = EarlyStopping(patience=20, verbose=1)
 model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
-reduce_lr = ReduceLROnPlateau(factor=0.5, patience=3, min_lr=0.00001, verbose=1)
+reduce_lr = ReduceLROnPlateau(factor=0.5, patience=5, min_lr=1e-5, verbose=1)
 
-epochs = 20
+epochs = 200
 
 history = model.fit_generator(train_gen,
                     steps_per_epoch=ceil(len(train_labels)/config.BATCH_SIZE),

@@ -19,4 +19,4 @@ VAL_DIR = "F:/AgriculturalDisease/AgriculturalDisease_validationset/images/"
 
 SAVE_MODEL_PATH = "./save/vgg16_224_categorical_crossentropy.model"
 
-BATCH_SIZE = 8
+BATCH_SIZE = 20
