@@ -16,6 +16,7 @@ TRAIN_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_train_anno
 TRAIN_DIR = "F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/"
 VAL_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_validation_annotations_20181021.json"
 VAL_DIR = "F:/AgriculturalDisease/AgriculturalDisease_validationset/images/"
+TEST_DIR = "F:/AgriculturalDisease/AgriculturalDisease_testA/images/"
 
 SAVE_MODEL_PATH = "./save/vgg16_224_categorical_crossentropy.model"
 

@@ -6,6 +6,7 @@ import numpy as np
 from math import ceil
 import tensorflow as tf
 import pickle
+import json
 
 import config
 import agumetation
@@ -24,6 +25,10 @@ def start_or_restore_training(sess,saver,checkpoint_dir):
         print('start training from new state')
     return sess,step
 
+def dump_to_json(path,obj):
+    with open(path,"w") as f:
+        json.dump(obj,f,ensure_ascii=False)
+
 def save_to_pickle(obj,savepath):
     with open(savepath,"wb") as file:
         pickle.dump(obj,file)
@@ -37,26 +42,6 @@ def load_pickle(path):
 def cv_imread(filepath):
     img = cv2.imdecode(np.fromfile(filepath,dtype=np.uint8),-1)
     return img
-
-#等比例缩放图片,size为最边短边长
-def resize_img(img,size):
-    h = img.shape[0]
-    w = img.shape[1]
-    scale = max(size/h,size/w)
-    resized_img = cv2.resize( img, (int(h*scale),int(w*scale)) )
-    return resized_img
-
-#对缩放图片进行随机切割,要求输入图片其中一边与切割大小相等
-def random_crop(img,size):
-    h = img.shape[0]
-    w = img.shape[1]
-    if h>w:
-        offset = random.randint(0, h - size)
-        croped_img = img[offset:offset+size, :]
-    else:
-        offset = random.randint(0, w - size)
-        croped_img = img[:, offset:offset+size]
-    return croped_img
 
 def train_agumetation(img):
     img = agumetation.resize_img(img,config.INPUT_SIZE)
@@ -96,6 +81,29 @@ def data_generator(img_paths,labels,batch_size,is_shuffle=True):
             batch_features = [train_agumetation(cv_imread(path)) for path in batch_paths]
 
             yield np.array(batch_features), np.array(batch_labels)
+
+def n_crop_and_flip(img,n_crop=3):
+    img = agumetation.resize_img(img,config.INPUT_SIZE)
+    imgs = agumetation.n_fold_crop(img,n_crop)
+    if not len(imgs)==n_crop:
+        raise Exception("the number of img is not equal to n_crop!")
+    imgs_flip = [cv2.flip(pic,1) for pic in imgs]
+    imgs.extend(imgs_flip)
+    return imgs
+
+def test_generator(paths,batch_size):
+    while True:
+        for offset in range(0, len(paths), batch_size):
+            batch_paths = paths[offset:offset + batch_size]
+            batch_imgs = [cv_imread(path) for path in batch_paths]
+
+            batch_features = []
+            for img in batch_imgs:
+                imgs = n_crop_and_flip(img)
+                batch_features.extend(imgs)
+            batch_features  = (np.array(batch_features)-128)/128
+            yield batch_features
+
 
 # def val_generator(img_paths,labels,batch_size,n_fold=3):
 #     num_sample = len(img_paths)

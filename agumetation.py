@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import random
+from math import fabs
 
 def SaltAndPepper(src, percetage):
     SP_NoiseImg = src.copy()
@@ -68,12 +69,14 @@ def rotate(image, angle=15, scale=0.9):
 def resize_img(img,size):
     h = img.shape[0]
     w = img.shape[1]
+    # print(img.shape)
     if size/h>size/w:
         scale = size/h
-        resized_img = cv2.resize( img, (size,int(w*scale)) )
+        resized_img = cv2.resize( img, (int(w*scale),size) )
     else:
         scale = size/w
-        resized_img = cv2.resize(img, (int(h*scale), size))
+        resized_img = cv2.resize(img, (size,int(h*scale)))
+    # print(resized_img.shape)
     return resized_img
 
 #对图片进行随机切割,输入图片其中一边与切割大小相等
@@ -91,21 +94,22 @@ def random_crop(img):
         return img
     return croped_img
 
-def n_fold_crop(img,n_fold=5):
+def n_fold_crop(img,n_crop=5):
     h = img.shape[0]
     w = img.shape[1]
     crop_imgs = []
+    if fabs(h-w)<10:
+        return [random_crop(img)]*3
     if h>w:
         intv = h - w
-        stride = int(intv/(n_fold-1))
-        for offset in range(0,intv,stride-1):
-            crop_imgs.append(img[offset:offset+w, :])
+        stride = int(intv/(n_crop))-1
+        for i in range(n_crop):
+            crop_imgs.append(img[i*stride:i*stride+w, :])
     else:
         intv = w - h
-        stride = int(intv / (n_fold-1))
-        for offset in range(0, intv, stride-1):
-            crop_imgs.append(img[: , offset:offset + h])
-    print(intv,stride)
+        stride = int(intv / (n_crop)) - 1
+        for i in range(n_crop):
+            crop_imgs.append(img[: , i*stride:i*stride+h])
     return crop_imgs
 
 
@@ -116,17 +120,17 @@ def random_flip(img,chance=0.5):
 
 
 
-# img = cv2.imread('F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/00e6ad4a-5a62-48d7-ac68-9c0b8ec87f5f___Rut._Bact.S 1472.JPG')
-# cv2.imshow("temp",img)
-# cv2.waitKey()
-#
-# size = 224
-# img = resize_img(img,size)
-# cv2.imshow("temp",img)
-# cv2.waitKey()
-#
-# crop_imgs = n_fold_crop(img)
-# for crop_img in crop_imgs:
-#     print(crop_img.shape)
-#     cv2.imshow("temp",crop_img)
-#     cv2.waitKey()
+img = cv2.imread('F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/00e6ad4a-5a62-48d7-ac68-9c0b8ec87f5f___Rut._Bact.S 1472.JPG')
+cv2.imshow("temp",img)
+cv2.waitKey()
+
+size = 224
+img = resize_img(img,size)
+cv2.imshow("temp",img)
+cv2.waitKey()
+
+crop_imgs = n_fold_crop(img)
+for crop_img in crop_imgs:
+    print(crop_img.shape)
+    cv2.imshow("temp",crop_img)
+    cv2.waitKey()

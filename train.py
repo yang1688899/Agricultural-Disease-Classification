@@ -20,45 +20,46 @@ val_gen = utils.data_generator(val_img_paths,val_labels,config.BATCH_SIZE,is_shu
 
 #build model
 print("the model will be save as %s"%config.SAVE_MODEL_PATH)
-base_model,model = network.vgg_network()
-
-#freeze the convolutional layers
-for layer in base_model.layers:
-    layer.trainable = False
-
-model.summary()
-
-print("train samples: %s"%len(train_labels))
-print("valid samples: %s"%len(val_labels))
-
-sgd = optimizers.SGD(lr=1e-3)
-model.compile(optimizer=sgd, loss='categorical_crossentropy')
-
-#callback
-early_stopping = EarlyStopping(patience=3, verbose=1)
-model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
-reduce_lr = ReduceLROnPlateau(factor=0.5, patience=2, min_lr=1e-4, verbose=1)
-
-epochs = 20
-
-print("start tuning the classifier......")
-history1 = model.fit_generator(train_gen,
-                    steps_per_epoch=ceil(len(train_labels)/config.BATCH_SIZE),
-                    epochs=epochs,
-                    validation_data=val_gen,
-                    validation_steps=ceil(len(val_labels)/config.BATCH_SIZE),
-                    callbacks=[early_stopping, model_checkpoint, reduce_lr],
-                    verbose=2)
+# base_model,model = network.vgg_network()
+#
+# #freeze the convolutional layers
+# for layer in base_model.layers:
+#     layer.trainable = False
+#
+# model.summary()
+#
+# print("train samples: %s"%len(train_labels))
+# print("valid samples: %s"%len(val_labels))
+#
+# sgd = optimizers.SGD(lr=1e-3)
+# model.compile(optimizer=sgd, loss='categorical_crossentropy')
+#
+# #callback
+# early_stopping = EarlyStopping(patience=3, verbose=1)
+# model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
+# reduce_lr = ReduceLROnPlateau(factor=0.5, patience=2, min_lr=1e-4, verbose=1)
+#
+# epochs = 20
+#
+# print("start tuning the classifier......")
+# history1 = model.fit_generator(train_gen,
+#                     steps_per_epoch=ceil(len(train_labels)/config.BATCH_SIZE),
+#                     epochs=epochs,
+#                     validation_data=val_gen,
+#                     validation_steps=ceil(len(val_labels)/config.BATCH_SIZE),
+#                     callbacks=[early_stopping, model_checkpoint, reduce_lr],
+#                     verbose=2)
 
 #load the finetuned model
 model = load_model(config.SAVE_MODEL_PATH)
 # unfeeze all layer
 for layer in model.layers:
     layer.trainable = True
-model.summary()
 
 adam = optimizers.Adam(lr=1e-4)
 model.compile(optimizer=adam, loss='categorical_crossentropy')
+
+model.summary()
 
 #callback
 early_stopping = EarlyStopping(patience=20, verbose=1)
@@ -76,4 +77,5 @@ history2 = model.fit_generator(train_gen,
                     callbacks=[early_stopping, model_checkpoint, reduce_lr],
                     verbose=2)
 
-utils.save_to_pickle([history1,history2],"history.p")
+# utils.save_to_pickle([history1,history2],"history.p")
+utils.save_to_pickle(history2,"history.p")
