@@ -53,6 +53,8 @@ def brighter(image, percetage=1.5):
             image_copy[xj, xi, 0] = np.clip(int(image[xj, xi, 0] * percetage), a_max=255, a_min=0)
             image_copy[xj, xi, 1] = np.clip(int(image[xj, xi, 1] * percetage), a_max=255, a_min=0)
             image_copy[xj, xi, 2] = np.clip(int(image[xj, xi, 2] * percetage), a_max=255, a_min=0)
+    print(np.max(image_copy))
+    print(type(image_copy[1, 1, 1]))
     return image_copy
 
 
@@ -116,21 +118,49 @@ def n_fold_crop(img,n_crop=5):
 def random_flip(img,chance=0.5):
     if random.random()<chance:
         img = cv2.flip(img,1)
+    if random.random()<chance:
+        img = cv2.flip(img,0)
     return img
 
 
+def random_light(image):
+    image_copy = image.copy()
 
-img = cv2.imread('F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/00e6ad4a-5a62-48d7-ac68-9c0b8ec87f5f___Rut._Bact.S 1472.JPG')
-cv2.imshow("temp",img)
-cv2.waitKey()
+    if random.random>0.5:
+        # getting brighter
+        percetage = random.random()+1.
+        image_copy = np.array(np.clip(image_copy*percetage, a_max=255, a_min=0),dtype=np.uint8)
+    else:
+        #getting darker
+        percetage = random.randrange(3,11)*0.1
+        image_copy = np.array(np.clip(image_copy * percetage, a_max=255, a_min=0), dtype=np.uint8)
 
-size = 224
-img = resize_img(img,size)
-cv2.imshow("temp",img)
-cv2.waitKey()
+    return image_copy
 
-crop_imgs = n_fold_crop(img)
-for crop_img in crop_imgs:
-    print(crop_img.shape)
-    cv2.imshow("temp",crop_img)
-    cv2.waitKey()
+# img = cv2.imread('F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/00e6ad4a-5a62-48d7-ac68-9c0b8ec87f5f___Rut._Bact.S 1472.JPG')
+# cv2.imshow("temp",img)
+# cv2.waitKey()
+#
+# img_d1 = darker_my(img,0.3)
+# cv2.imshow("temp",img_d1)
+# cv2.waitKey()
+
+# img_d2 = darker_my(img_d1,1.5)
+# cv2.imshow("temp",img_d2)
+# cv2.waitKey()
+#
+# img_d3 = darker_my(img_d2,1.5)
+# cv2.imshow("temp",img_d2)
+# cv2.waitKey()
+# size = 224
+# img = resize_img(img,size)
+# cv2.imshow("temp",img)
+# cv2.waitKey()
+#
+# crop_imgs = n_fold_crop(img)
+# for crop_img in crop_imgs:
+#     print(crop_img.shape)
+#     cv2.imshow("temp",crop_img)
+#     cv2.waitKey()
+
+
