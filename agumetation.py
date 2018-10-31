@@ -126,7 +126,7 @@ def random_flip(img,chance=0.5):
 def random_light(image):
     image_copy = image.copy()
 
-    if random.random>0.5:
+    if random.random()>0.5:
         # getting brighter
         percetage = random.random()+1.
         image_copy = np.array(np.clip(image_copy*percetage, a_max=255, a_min=0),dtype=np.uint8)
@@ -140,11 +140,11 @@ def random_light(image):
 # img = cv2.imread('F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/00e6ad4a-5a62-48d7-ac68-9c0b8ec87f5f___Rut._Bact.S 1472.JPG')
 # cv2.imshow("temp",img)
 # cv2.waitKey()
-#
+
 # img_d1 = darker_my(img,0.3)
 # cv2.imshow("temp",img_d1)
 # cv2.waitKey()
-
+#
 # img_d2 = darker_my(img_d1,1.5)
 # cv2.imshow("temp",img_d2)
 # cv2.waitKey()
@@ -152,6 +152,7 @@ def random_light(image):
 # img_d3 = darker_my(img_d2,1.5)
 # cv2.imshow("temp",img_d2)
 # cv2.waitKey()
+
 # size = 224
 # img = resize_img(img,size)
 # cv2.imshow("temp",img)
@@ -162,5 +163,5 @@ def random_light(image):
 #     print(crop_img.shape)
 #     cv2.imshow("temp",crop_img)
 #     cv2.waitKey()
-
+#
 

@@ -47,8 +47,16 @@ def train_agumetation(img):
     img = agumetation.resize_img(img,config.INPUT_SIZE)
     img = agumetation.random_crop(img)
     img = agumetation.random_flip(img,0.5)
+    img = agumetation.random_light(img)
 
-    return img-128/128.
+    return (img-128)/128.
+
+def val_agumetation(img):
+    img = agumetation.resize_img(img, config.INPUT_SIZE)
+    img = agumetation.random_crop(img)
+    img = agumetation.random_flip(img, 0.5)
+
+    return (img - 128) / 128.
 
 # def val_agumetation(img,n_fold=3):
 #     img = agumetation.resize_img(img,config.INPUT_SIZE)
@@ -66,7 +74,7 @@ def process_annotation(anno_file,dir):
             labels.append(anno["disease_class"])
     return img_paths, labels
 
-def data_generator(img_paths,labels,batch_size,is_shuffle=True):
+def train_generator(img_paths,labels,batch_size,is_shuffle=True):
     if is_shuffle:
         img_paths,labels = shuffle(img_paths,labels)
     num_sample = len(img_paths)
@@ -82,13 +90,33 @@ def data_generator(img_paths,labels,batch_size,is_shuffle=True):
 
             yield np.array(batch_features), np.array(batch_labels)
 
+def val_generator(img_paths,labels,batch_size,is_shuffle=True):
+    if is_shuffle:
+        img_paths,labels = shuffle(img_paths,labels)
+    num_sample = len(img_paths)
+    while True:
+        if is_shuffle:
+            img_paths, labels = shuffle(img_paths, labels)
+
+        for offset in range(0,num_sample,batch_size):
+            batch_paths = img_paths[offset:offset+batch_size]
+            batch_labels = labels[offset:offset+batch_size]
+
+            batch_features = [val_agumetation(cv_imread(path)) for path in batch_paths]
+
+            yield np.array(batch_features), np.array(batch_labels)
+
 def n_crop_and_flip(img,n_crop=3):
     img = agumetation.resize_img(img,config.INPUT_SIZE)
     imgs = agumetation.n_fold_crop(img,n_crop)
     if not len(imgs)==n_crop:
         raise Exception("the number of img is not equal to n_crop!")
-    imgs_flip = [cv2.flip(pic,1) for pic in imgs]
-    imgs.extend(imgs_flip)
+    imgs_flip_d = [cv2.flip(pic,1) for pic in imgs]
+    imgs_flip_h1 = [cv2.flip(pic,0) for pic in imgs]
+    imgs_flip_h2 = [cv2.flip(pic,0) for pic in imgs_flip_d]
+    imgs.extend(imgs_flip_d)
+    imgs.extend(imgs_flip_h1)
+    imgs.extend(imgs_flip_h2)
     return imgs
 
 def test_generator(paths,batch_size):
@@ -101,7 +129,7 @@ def test_generator(paths,batch_size):
             for img in batch_imgs:
                 imgs = n_crop_and_flip(img)
                 batch_features.extend(imgs)
-            batch_features  = (np.array(batch_features)-128)/128
+            batch_features  = (np.array(batch_features)-128.)/128.
             yield batch_features
 
 
