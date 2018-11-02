@@ -49,14 +49,14 @@ def train_agumetation(img):
     img = agumetation.random_flip(img,0.5)
     img = agumetation.random_light(img)
 
-    return (img-128)/128.
+    return (img-128.)/128.
 
 def val_agumetation(img):
     img = agumetation.resize_img(img, config.INPUT_SIZE)
     img = agumetation.random_crop(img)
     img = agumetation.random_flip(img, 0.5)
 
-    return (img - 128) / 128.
+    return (img - 128.) / 128.
 
 # def val_agumetation(img,n_fold=3):
 #     img = agumetation.resize_img(img,config.INPUT_SIZE)

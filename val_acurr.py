@@ -71,3 +71,20 @@ pred_labels = average_prediction(predictions,n_crop=3,is_flip=True)
 pred_list = [{"image_id":id,"disease_class":int(label)} for id,label in zip(val_ids,pred_labels)]
 
 utils.dump_to_json("./val.json",pred_list)
+
+
+# val_gen = utils.val_generator(val_paths,val_ids,batch_size,is_shuffle=False)
+#
+# for i in range(100):
+#     feature_t = next(val_test_gen)
+#     feature_v,_ = next(val_gen)
+#     predict_t = model.predict(feature_t)
+#     predict_v  = model.predict(feature_v)
+#
+#     print(type(feature_t[0][0][0][0]))
+#     print(type(feature_v[0][0][0][0]))
+#
+#     print(np.argmax(predict_t,axis=1))
+#     print(np.argmax(predict_v))
+#
+#

@@ -39,7 +39,7 @@ early_stopping = EarlyStopping(patience=3, verbose=1)
 model_checkpoint = ModelCheckpoint(config.SAVE_MODEL_PATH, save_best_only=True, verbose=1)
 reduce_lr = ReduceLROnPlateau(factor=0.5, patience=2, min_lr=1e-4, verbose=1)
 
-epochs = 20
+epochs = 50
 
 print("start tuning the classifier......")
 history1 = model.fit_generator(train_gen,
