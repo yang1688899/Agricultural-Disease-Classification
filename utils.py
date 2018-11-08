@@ -143,3 +143,17 @@ def test_generator(paths,batch_size):
 #             batch_features = [train_agumetation(cv_imread(path)) for path in batch_paths]
 #
 #             yield np.array(batch_features), np.array(batch_labels)
+
+def average_prediction_multi(predictions_list,num_test,n_crop=3,is_flip=True):
+    if is_flip:
+        num = n_crop*4
+    else:
+        num = n_crop
+    pre_labels = []
+    predictions_combine = np.sum(np.array(predictions_list),axis=0)
+    for i in range(0, len(predictions_combine), num):
+        batch_preds = predictions_combine[i:i + num]
+        sum_pred = np.sum(batch_preds, axis=0)
+        pre_labels.append(np.argmax(sum_pred))
+    return pre_labels
+

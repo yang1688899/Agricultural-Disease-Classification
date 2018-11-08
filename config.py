@@ -11,13 +11,13 @@ LABEL_NAMES = ["苹果健康","苹果黑星病一般","苹果黑星病严重","�
                "番茄斑点病一般","番茄斑点病严重","番茄斑枯病一般","番茄斑枯病严重","番茄红蜘蛛损伤一般",
                "番茄红蜘蛛损伤严重","番茄黄化曲叶病毒病一般","番茄黄化曲叶病毒病严重","番茄花叶病毒病"]
 
-INPUT_SIZE = 224
+INPUT_SIZE = 299
 TRAIN_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_train_annotations_20181021.json"
 TRAIN_DIR = "F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/"
 VAL_ANNOTATION_FILE = "F:/AgriculturalDisease/ai_challenger_pdr2018_validation_annotations_20181021.json"
 VAL_DIR = "F:/AgriculturalDisease/AgriculturalDisease_validationset/images/"
 TEST_DIR = "F:/AgriculturalDisease/AgriculturalDisease_testA/images/"
 
-SAVE_MODEL_PATH = "./save/vgg16_224_categorical_crossentropy.model"
+SAVE_MODEL_PATH = "./save/inceptionV3_299.model"
 
 BATCH_SIZE = 16

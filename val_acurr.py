@@ -70,7 +70,7 @@ pred_labels = average_prediction(predictions,n_crop=3,is_flip=True)
 
 pred_list = [{"image_id":id,"disease_class":int(label)} for id,label in zip(val_ids,pred_labels)]
 
-utils.dump_to_json("./val.json",pred_list)
+utils.dump_to_json("./val_interceptionV3.json",pred_list)
 
 
 # val_gen = utils.val_generator(val_paths,val_ids,batch_size,is_shuffle=False)

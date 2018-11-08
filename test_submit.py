@@ -36,7 +36,7 @@ pred_labels = average_prediction(predictions,n_crop=3,is_flip=True)
 
 pred_list = [{"image_id":id,"disease_class":int(label)} for id,label in zip(test_ids,pred_labels)]
 
-utils.dump_to_json("./submit.json",pred_list)
+utils.dump_to_json("./submit_interceptionV3.json",pred_list)
 
 utils.save_to_pickle(predictions,"./predictions.p")
 

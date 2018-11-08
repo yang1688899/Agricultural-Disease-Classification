@@ -1,4 +1,5 @@
 __pycache__
 .idea
 save
-submit.json
+*.json
+*.p
