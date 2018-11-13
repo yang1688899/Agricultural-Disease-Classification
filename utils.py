@@ -119,7 +119,7 @@ def n_crop_and_flip(img,n_crop=3):
     imgs.extend(imgs_flip_h2)
     return imgs
 
-def test_generator(paths,batch_size):
+def test_generator(paths,n_crop, batch_size):
     while True:
         for offset in range(0, len(paths), batch_size):
             batch_paths = paths[offset:offset + batch_size]
@@ -127,7 +127,7 @@ def test_generator(paths,batch_size):
 
             batch_features = []
             for img in batch_imgs:
-                imgs = n_crop_and_flip(img)
+                imgs = n_crop_and_flip(img,n_crop)
                 batch_features.extend(imgs)
             batch_features  = (np.array(batch_features)-128.)/128.
             yield batch_features

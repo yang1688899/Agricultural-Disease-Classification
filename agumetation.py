@@ -101,7 +101,7 @@ def n_fold_crop(img,n_crop=5):
     w = img.shape[1]
     crop_imgs = []
     if fabs(h-w)<10:
-        return [random_crop(img)]*3
+        return [random_crop(img)]*n_crop
     if h>w:
         intv = h - w
         stride = int(intv/(n_crop))-1
