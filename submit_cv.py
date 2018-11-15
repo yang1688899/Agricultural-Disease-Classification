@@ -24,8 +24,11 @@ folds = 5
 n_crop = 5
 batch_size = 2
 
-test_paths = glob.glob(config.TEST_DIR+"*.jpg")
+test_paths = glob.glob(config.TEST_DIR_B+"*.jpg")
 test_ids = [path.split("\\")[-1] for path in test_paths]
+
+print(test_ids)
+print(len(test_ids))
 
 predictions_list = []
 for i in range(folds):
@@ -45,8 +48,8 @@ predictions_combine = np.sum(np.array(predictions_list), axis=0)
 utils.save_to_pickle(predictions_combine, "./preds/inceptionV3_combine.p")
 print(len(predictions_combine) / len(test_ids))
 
-pred_labels = average_prediction(predictions_combine, n_crop=n_crop, is_flip=True)
-
-pred_list = [{"image_id": id, "disease_class": int(label)} for id, label in zip(test_ids, pred_labels)]
-
-utils.dump_to_json("./val_inceptionV3_299_combine.json", pred_list)
+# pred_labels = average_prediction(predictions_combine, n_crop=n_crop, is_flip=True)
+#
+# pred_list = [{"image_id": id, "disease_class": int(label)} for id, label in zip(test_ids, pred_labels)]
+#
+# utils.dump_to_json("./val_inceptionV3_299_combine.json", pred_list)
