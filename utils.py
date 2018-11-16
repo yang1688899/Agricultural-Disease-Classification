@@ -7,6 +7,7 @@ from math import ceil
 import tensorflow as tf
 import pickle
 import json
+import os
 
 import config
 import agumetation
@@ -28,6 +29,11 @@ def start_or_restore_training(sess,saver,checkpoint_dir):
 def dump_to_json(path,obj):
     with open(path,"w") as f:
         json.dump(obj,f,ensure_ascii=False)
+
+def load_json(path):
+    with open(path,"r") as f:
+        obj = json.load(f)
+    return obj
 
 def save_to_pickle(obj,savepath):
     with open(savepath,"wb") as file:

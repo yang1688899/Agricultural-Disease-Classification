@@ -137,6 +137,17 @@ def random_light(image):
 
     return image_copy
 
+def random_rotate(image, angle=45, scale=0.9):
+    w = image.shape[1]
+    h = image.shape[0]
+
+    angle = random.randint(0,angle)
+    # rotate matrix
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, scale)
+    # rotate
+    image = cv2.warpAffine(image, M, (w, h))
+    return image
+
 # img = cv2.imread('F:/AgriculturalDisease/AgriculturalDisease_trainingset/images/00e6ad4a-5a62-48d7-ac68-9c0b8ec87f5f___Rut._Bact.S 1472.JPG')
 # cv2.imshow("temp",img)
 # cv2.waitKey()
